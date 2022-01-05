@@ -530,11 +530,11 @@ private struct _JSONKeyedEncodingContainer<K : CodingKey> : KeyedEncodingContain
 
         let containerKey = fakeKey ?? _converted(key).stringValue
 
-        if case let .useDiscriminator(disc) =  self.encoder.options.enumEncodingStrategy, Key.self is EnumCodingKey.Type {
+        if case let .useDiscriminator(disc) =  self.encoder.options.enumEncodingStrategy, let myKey = Key.self as? MyCodingKey.Type, myKey.enumType == .enumCodingKey {
             let container = _JSONKeyedEncodingContainer<NestedKey>(referencing: self.encoder, codingPath: self.codingPath, wrapping: self.container)
             self.container[disc] = containerKey
             return KeyedEncodingContainer(container)
-        } else if case .flattenUnlabelledSingleValues =  self.encoder.options.enumEncodingStrategy, NestedKey.self is SingleUnlabelledEnumCaseCodingKey.Type {
+        } else if case .flattenUnlabelledSingleValues =  self.encoder.options.enumEncodingStrategy, let myKey = NestedKey.self as? MyCodingKey.Type, myKey.enumType == .singleUnlabelledEnumCaseCodingKey {
             let container = _JSONKeyedEncodingContainer<NestedKey>(referencing: self.encoder, codingPath: self.codingPath, wrapping: self.container, fakeKey: containerKey)
             return KeyedEncodingContainer(container)
         }
@@ -550,7 +550,7 @@ private struct _JSONKeyedEncodingContainer<K : CodingKey> : KeyedEncodingContain
             self.container[containerKey] = dictionary
         }
 
-        if NestedKey.self is NoValueEnumCaseCodingKey.Type {
+        if let myKey = NestedKey.self as? MyCodingKey.Type, myKey.enumType == .noValueEnumCaseCodingKey {
             switch self.encoder.options.noValueEnumEncodingStrategy {
             case .useBool(let bool):
                 self.container[containerKey] = bool
@@ -1327,7 +1327,7 @@ private class __JSONDecoder : Decoder {
             throw DecodingError._typeMismatch(at: self.codingPath, expectation: [String : Any].self, reality: self.storage.topContainer)
         }
 
-        if case let .useDiscriminator(disc) = self.options.enumDecodingStrategy, Key.self is EnumCodingKey.Type {
+        if case let .useDiscriminator(disc) = self.options.enumDecodingStrategy, let myKey = Key.self as? MyCodingKey.Type, myKey.enumType == .enumCodingKey {
             guard let discKey = topContainer[disc] as? String else {
                 throw DecodingError.valueNotFound(UnkeyedDecodingContainer.self,
                                                   DecodingError.Context(codingPath: self.codingPath,
@@ -1714,7 +1714,7 @@ private struct _JSONKeyedDecodingContainer<K : CodingKey> : KeyedDecodingContain
                                                                   debugDescription: "Cannot get \(KeyedDecodingContainer<NestedKey>.self) -- no value found for key \(_errorDescription(of: key))"))
         }
 
-        if NestedKey.self is NoValueEnumCaseCodingKey.Type {
+        if let myKey = NestedKey.self as? MyCodingKey.Type, myKey.enumType == .noValueEnumCaseCodingKey {
             switch self.decoder.options.noValueEnumDecodingStrategy {
             case .useDefaultDecoding:
                 ()
@@ -1740,7 +1740,7 @@ private struct _JSONKeyedDecodingContainer<K : CodingKey> : KeyedDecodingContain
             }
         }
 
-        if case .flattenUnlabelledSingleValues = self.decoder.options.enumDecodingStrategy,  NestedKey.self is SingleUnlabelledEnumCaseCodingKey.Type {
+        if case .flattenUnlabelledSingleValues = self.decoder.options.enumDecodingStrategy, let myKey = NestedKey.self as? MyCodingKey.Type, myKey.enumType == .singleUnlabelledEnumCaseCodingKey {
             let container = _JSONKeyedDecodingContainer<NestedKey>(referencing: self.decoder, wrapping: self.container, fakeKey: key.stringValue)
             return KeyedDecodingContainer(container)
 

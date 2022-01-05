@@ -67,11 +67,13 @@ enum Command: Codable, Equatable {
 }
 
 // contains keys for all cases of the enum
-enum CodingKeys: CodingKey, EnumCodingKey {
+enum CodingKeys: CodingKey, MyCodingKey {
   case load
   case store
-    case single
-    case none
+  case single
+  case none
+    
+    static var enumType: CodingKeyEnumType? { .enumCodingKey }
 }
 
 // contains keys for all associated values of `case load`
@@ -80,13 +82,17 @@ enum LoadCodingKeys: CodingKey {
 }
 
 // contains keys for all associated values of `case load`
-enum SingleCodingKeys: CodingKey, SingleUnlabelledEnumCaseCodingKey {
+enum SingleCodingKeys: CodingKey, MyCodingKey {
   case _0
+    static var enumType: CodingKeyEnumType? { .singleUnlabelledEnumCaseCodingKey }
+
 }
 
 // contains keys for all associated values of `case load`
-enum NoneCodingKeys: CodingKey, NoValueEnumCaseCodingKey {
+enum NoneCodingKeys: CodingKey, MyCodingKey {
   case _0
+    static var enumType: CodingKeyEnumType? { .noValueEnumCaseCodingKey }
+
 }
 
 

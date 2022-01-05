@@ -16,9 +16,19 @@
 import Foundation
 
 
-public protocol SingleUnlabelledEnumCaseCodingKey {}
-public protocol NoValueEnumCaseCodingKey {}
-public protocol EnumCodingKey {}
+
+public enum CodingKeyEnumType {
+    case enumCodingKey
+    case noValueEnumCaseCodingKey
+    case singleUnlabelledEnumCaseCodingKey
+}
+
+public protocol MyCodingKey: CodingKey {
+    static var enumType: CodingKeyEnumType? { get }
+}
+extension MyCodingKey {
+    static var enumType: CodingKeyEnumType? { nil }
+}
 
 // Both of these error types bridge to NSError, and through the entry points they use, no further work is needed to make them localized.
 //extension EncodingError : LocalizedError {}
